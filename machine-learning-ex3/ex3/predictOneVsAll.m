@@ -31,6 +31,9 @@ X = [ones(m, 1) X];
 %       
 
 temp = X * all_theta';
+
+% We'll need the index of the maximum prob in each row. This corresponds to the class
+% that has been predicted. max_prob value is not used. 
 [max_prob, p] = max(temp, [], 2);
 
 % =========================================================================

@@ -21,13 +21,16 @@ p = zeros(size(X, 1), 1);
 %       can use max(A, [], 2) to obtain the max for each row.
 %
 
+% Compute activation for the hidden layer.
+X = [ones(m, 1) X];
+a2 = sigmoid(X * Theta1');
 
+% Add +1 bias term to the hidden layer a2
+a2 = [ones(size(a2,1) ,1)   a2];
 
-
-
-
-
-
+% Compute activations for the output layer  
+a3 = sigmoid(a2 * Theta2');
+[max_prob, p] = max(a3, [], 2);
 
 % =========================================================================
 
