@@ -76,13 +76,7 @@ for i = 1:m
 endfor
 
 %Calculate cost J
-for i = 1:m
-	for k = 1:num_labels
-		J += newY(i,k) * log(h(i, k)) + (1 - newY(i,k)) * log(1 - h(i, k)); 
-	endfor
-endfor
-
-J = (-1/m) * J;
+J = (-1/m) * sum(sum(newY .* log(h) + (1 - newY) .* log(1 - h))); 
 
 % -------------------------------------------------------------
 
