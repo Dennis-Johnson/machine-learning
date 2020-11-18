@@ -39,6 +39,23 @@ Theta2_grad = zeros(size(Theta2));
 %         cost function computation is correct by verifying the cost
 %         computed in ex4.m
 %
+	a1 = [ones(m, 1) X];
+	z2 = a1 * Theta1'
+
+	a2 = [ones(m, 1) sigmoid(z2)]
+	h  = sigmoid(a2 * Theta2');
+
+% For each entry of y(i) = p, make a new vector where new_Y(i,P) = 1
+% and new_Y(i,not P) = 0  
+	newY = zeros(m, num_labels);
+	for i = 1:m
+		index = y(i);
+		newY(i, index) = 1;
+	endfor
+ 
+% Calculate cost J
+	J = (-1/m) * sum(sum(newY .* log(h) + (1 - newY) .* log(1 - h))); 
+
 % Part 2: Implement the backpropagation algorithm to compute the gradients
 %         Theta1_grad and Theta2_grad. You should return the partial derivatives of
 %         the cost function with respect to Theta1 and Theta2 in Theta1_grad and
@@ -54,6 +71,18 @@ Theta2_grad = zeros(size(Theta2));
 %               over the training examples if you are implementing it for the 
 %               first time.
 %
+% Calculate error terms and gradients
+	for i = 1:m
+		delta_3 = h(i, :) - newY(i, :);	
+		delta_2 = (delta_3 * Theta2) .* [1 sigmoidGradient(z2(i, :))]; 
+
+		Theta2_grad += delta_3' * a2(i, :);
+		Theta1_grad += delta_2(2:end)' * a1(i, :);  
+	endfor
+
+	Theta2_grad = (1/m) * Theta2_grad;
+	Theta1_grad = (1/m) * Theta1_grad; 
+
 % Part 3: Implement regularization with the cost function and gradients.
 %
 %         Hint: You can implement this around the code for
@@ -61,29 +90,17 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
-
-X = [ones(m, 1) X];
-a2 = sigmoid(X * Theta1')
-a2 = [ones(m, 1) a2];
-h = sigmoid(a2 * Theta2');
-
-% For each entry of y(i) = p, make a new vector where new_Y(i,P) = 1
-% and new_Y(i,not P) = 0  
-newY = zeros(size(y, 1), num_labels);
-for i = 1:m
-	index = y(i);
-	newY(i, index) = 1;
-endfor
-
-%Calculate cost J
-J = (-1/m) * sum(sum(newY .* log(h) + (1 - newY) .* log(1 - h))); 
-
-% -------------------------------------------------------------
+	% Add regularization term for cost function J 
+	J += (lambda / (2*m)) * (sum(sum(Theta1(:, 2:end) .^ 2)) + ... 
+													 sum(sum(Theta2(:, 2:end).^ 2)));
+	
+	% Add regularization term for gradients, excluding the bias term
+	Theta2_grad(:, 2:end) += (lambda / m) * Theta2(:, 2:end);	
+	Theta1_grad(:, 2:end) += (lambda / m) * Theta1(:, 2:end);
 
 % =========================================================================
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
-
 
 end
